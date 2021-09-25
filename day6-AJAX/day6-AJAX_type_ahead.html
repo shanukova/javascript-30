@@ -16,17 +16,47 @@
       <li>or a state</li>
     </ul>
   </form>
+
   <script>
     const endpoint = 'https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json';
     const cities = [];
 
    fetch(endpoint)
       .then(response => response.json())
-      .then((citiesJson) => {
-          citiesJson.forEach(cityJson => cities.push(cityJson))
+      .then((citiesObj) => {
+          citiesObj.forEach(cityObj => cities.push(cityObj))
       });
 
-    console.log(cities);
+      console.log(cities);
+
+    function findMatches(input, cities) {
+      return cities.filter(cityObj => {
+        const regex = new RegExp(input, 'gi');
+        return cityObj.city.match(regex) || cityObj.state.match(regex)
+      });
+    };
+
+    function displayMatches() {
+      const matchArray = findMatches(this.value, cities);
+      console.log(matchArray);
+      const html = matchArray.map(cityObj => {
+        return `
+          <li>
+            <span class="name">${cityObj.city}, ${cityObj.state}</span>
+            <span class="population">${cityObj.population}</span>
+          </li>
+        `
+      }).join('');
+      suggestions.innerHTML = html;
+    }
+
+    const searchInput = document.querySelector('.search');
+    const suggestions = document.querySelector('.suggestions');
+
+    searchInput.addEventListener('change', displayMatches);
+    searchInput.addEventListener('keyup', displayMatches);
+
+
   </script>
 </body>
 
